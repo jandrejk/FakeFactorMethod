@@ -15,6 +15,12 @@ def RenameCutForDraw (cut_string) :
 
 pre_selection_files = [
     {
+        "path" : "/ceph/jandrej/fakefactors/2018_v15_test_puppi/preselection/mt/preselection_data.root",
+        "name" : "data",
+        "channel" : "mt",
+        "year" : "2018"
+    },
+    {
         "path" : "/ceph/jandrej/fakefactors/2018_v15_test_puppi/preselection/mt/preselection_Wjets.root",
         "name" : "Wjets",
         "channel" : "mt",
@@ -23,12 +29,6 @@ pre_selection_files = [
     {
         "path" : "/ceph/jandrej/fakefactors/2018_v15_test_puppi/preselection/mt/preselection_EMB.root",
         "name" : "EMB",
-        "channel" : "mt",
-        "year" : "2018"
-    },
-    {
-        "path" : "/ceph/jandrej/fakefactors/2018_v15_test_puppi/preselection/mt/preselection_data.root",
-        "name" : "data",
         "channel" : "mt",
         "year" : "2018"
     },
@@ -76,57 +76,68 @@ def FillHistos (histograms, variables, weight, tree) :
     for iv, v in enumerate(variables) :
         for h,w in list(zip(histograms,weight)) :
             h[iv].Fill( eval(v["name"]),
-            w
+            w 
             )  
-
-def DR_creation(path, name, Variable, cuts) :
+def FillHistosPredicted (histograms, variables, weight, fractions, tree) :
+    for iv, v in enumerate(variables) :
+        fraction_weight = GetFractionFromHistogram(fractions[iv],eval(v["name"]))
+        for h,w in list(zip(histograms,weight)) :
+            h[iv].Fill( eval(v["name"]),
+            w * fraction_weight
+            )  
+def GetFractionFromHistogram (histogram, xvalue) :
+    return histogram.GetBinContent(histogram.GetXaxis().FindBin(xvalue))
+    
+# path, process, channel, year, Variable, cuts, region, DR_cuts
+def DR_creation(path, pathRawFF, channel, year, name, Variable, cuts, region, DR_cuts) :
     preselection_file = ROOT.TFile(path)
     tree = preselection_file.Get("Events") 
-
-    DR_cuts = " * ".join([cuts["-OS-"],cuts["-2L-"],cuts["-3L-"],cuts["-LepIso-"],cuts["-MT_DR-"],cuts["-Bpt_1-"]])
+    pathFractions="{0}/{1}/{2}".format(region,year,channel)
     extension = "_{}".format(name)
 
-    print "-"*90
-    print "DR cut: {}".format(DR_cuts)
-    print "-"*90
-
-
-    FF_Wjets = ROOT.TFile("/home/jandrej/DeepTauFFproduction/2018_v15/CMSSW_8_0_25/src/ViennaTool/fakefactor/data_mt/FF_corr_Wjets_MCsum_noGen_fitted.root") 
-
+    FF_Wjets = ROOT.TFile(pathRawFF) 
     Tgraph_FF_Wjets_0jet = FF_Wjets.Get("dm0_njet0")
     Tgraph_FF_Wjets_1jet = FF_Wjets.Get("dm0_njet1")
-    region = "DR_Wjets"
+    Tgraph_FF_Wjets_2jet = FF_Wjets.Get("dm0_njet2")
+
+    frac_0j = []
+    frac_1j = []
+    frac_2j = []
+    for v in Variable :
+        fractionFile = ROOT.TFile("{0}/{1}_fracWjets.root".format(pathFractions,v["hist_name"]))
+        frac_0j.append(fractionFile.Get(v["hist_name"]+region+"_ARfraction_0jet"))
+        frac_0j[-1].SetDirectory(0)
+        frac_1j.append(fractionFile.Get(v["hist_name"]+region+"_ARfraction_1jet"))
+        frac_1j[-1].SetDirectory(0)
+        frac_2j.append(fractionFile.Get(v["hist_name"]+region+"_ARfraction_2jet"))
+        frac_2j[-1].SetDirectory(0)
+        fractionFile.Close()  
 
 
     histogram_iso_tau           = [ROOT.TH1D(v["hist_name"]+region+"_pass","{} distribution passing tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
     histogram_anti_iso_tau      = [ROOT.TH1D(v["hist_name"]+region+"_fail","{} distribution failing tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
     histogram_iso_tau_predicted = [ROOT.TH1D(v["hist_name"]+region+"_pred","{} distribution predicted in isolated tau-region".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
 
-    histogram_iso_tau_0jet           = [ROOT.TH1D(v["hist_name"]+region+"_pass_0jet","{} distribution passing tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
-    histogram_anti_iso_tau_0jet      = [ROOT.TH1D(v["hist_name"]+region+"_fail_0jet","{} distribution failing tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
-    histogram_iso_tau_predicted_0jet = [ROOT.TH1D(v["hist_name"]+region+"_pred_0jet","{} distribution predicted tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_iso_tau_0jet           = [ROOT.TH1D(v["hist_name"]+region+"_pass_0jet","{} distribution passing tau isolation criteria - 0 jet".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_anti_iso_tau_0jet      = [ROOT.TH1D(v["hist_name"]+region+"_fail_0jet","{} distribution failing tau isolation criteria - 0 jet".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_iso_tau_predicted_0jet = [ROOT.TH1D(v["hist_name"]+region+"_pred_0jet","{} distribution predicted tau isolation criteria - 0 jet".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
 
-    histogram_iso_tau_1jet           = [ROOT.TH1D(v["hist_name"]+region+"_pass_1jet","{} distribution passing tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
-    histogram_anti_iso_tau_1jet      = [ROOT.TH1D(v["hist_name"]+region+"_fail_1jet","{} distribution failing tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
-    histogram_iso_tau_predicted_1jet = [ROOT.TH1D(v["hist_name"]+region+"_pred_1jet","{} distribution predicted tau isolation criteria".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_iso_tau_1jet           = [ROOT.TH1D(v["hist_name"]+region+"_pass_1jet","{} distribution passing tau isolation criteria - 1 jet".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_anti_iso_tau_1jet      = [ROOT.TH1D(v["hist_name"]+region+"_fail_1jet","{} distribution failing tau isolation criteria - 1 jet".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_iso_tau_predicted_1jet = [ROOT.TH1D(v["hist_name"]+region+"_pred_1jet","{} distribution predicted tau isolation criteria - 1 jet".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
     
-
+    histogram_iso_tau_2jet           = [ROOT.TH1D(v["hist_name"]+region+"_pass_2jet","{} distribution passing tau isolation criteria - 2 jet or more".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_anti_iso_tau_2jet      = [ROOT.TH1D(v["hist_name"]+region+"_fail_2jet","{} distribution failing tau isolation criteria - 2 jet or more".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
+    histogram_iso_tau_predicted_2jet = [ROOT.TH1D(v["hist_name"]+region+"_pred_2jet","{} distribution predicted tau isolation criteria - 2 jet or more".format(region),len(v["binning"])-1,v["binning"]) for v in Variable] 
     
-
-    # move one indent left 
-    selection_cut = DR_cuts
 
     nEntries = tree.GetEntries()
-
     passing = 0
     failing = 0
-
-
-
     for i in range(0, nEntries) : 
         tree.GetEntry(i)
 
-        if ( eval(selection_cut.replace(" * ", " and ")) ) : # passes DR selection criteria
+        if ( eval(DR_cuts.replace(" * ", " and ")) ) : # passes DR selection criteria
 
             
             if ( eval(cuts["-TauIsoPass-"]) ) : # passes tau isolation requirement
@@ -134,26 +145,40 @@ def DR_creation(path, name, Variable, cuts) :
                 passing += 1
                 if ( eval(cuts["-NJET_0-"]) ) :
                     FillHistos(tree=tree, histograms=[histogram_iso_tau_0jet], variables=Variable, weight=[tree.weight_sf])
-                elif ( eval(cuts["-NJET_geq1-"]) ) :
+                elif ( eval(cuts["-NJET_1-"]) ) :
                     FillHistos(tree=tree, histograms=[histogram_iso_tau_1jet], variables=Variable, weight=[tree.weight_sf])
+                elif ( eval(cuts["-NJET_geq2-"]) ) :
+                    FillHistos(tree=tree, histograms=[histogram_iso_tau_2jet], variables=Variable, weight=[tree.weight_sf])
 
             elif ( eval(cuts["-TauIsoFail-"])  ) : # fails tau isolation requirement
                 
                 # retrieve FF value
                 raw_FF_value = 0
+                frac = []
                 if ( tree.njets==0 ) :
                     raw_FF_value = Tgraph_FF_Wjets_0jet.Eval(tree.alltau_pt[tree.tau_iso_ind])
-                else :
+                    frac=frac_0j
+                elif (tree.njets==1) :
                     raw_FF_value = Tgraph_FF_Wjets_1jet.Eval(tree.alltau_pt[tree.tau_iso_ind])
-                
-                FillHistos(tree=tree, histograms=[histogram_anti_iso_tau,histogram_iso_tau_predicted], variables=Variable, weight=[tree.weight_sf,(tree.weight_sf * raw_FF_value)])
+                    frac=frac_1j
+                elif (tree.njets>=2)  :
+                    raw_FF_value = Tgraph_FF_Wjets_2jet.Eval(tree.alltau_pt[tree.tau_iso_ind])
+                    frac=frac_2j
+
+                FillHistos(tree=tree, histograms=[histogram_anti_iso_tau], variables=Variable, weight=[tree.weight_sf])
+                FillHistosPredicted(tree=tree, histograms=[histogram_iso_tau_predicted], variables=Variable, weight=[(tree.weight_sf * raw_FF_value)],fractions=frac)
                 failing += 1
                 
 
                 if ( eval(cuts["-NJET_0-"]) ) :
-                    FillHistos(tree=tree, histograms=[histogram_anti_iso_tau_0jet,histogram_iso_tau_predicted_0jet], variables=Variable, weight=[tree.weight_sf,(tree.weight_sf * raw_FF_value)])
-                elif ( eval(cuts["-NJET_geq1-"]) ) :
-                    FillHistos(tree=tree, histograms=[histogram_anti_iso_tau_1jet,histogram_iso_tau_predicted_1jet], variables=Variable, weight=[tree.weight_sf,(tree.weight_sf * raw_FF_value)])
+                    FillHistos(tree=tree, histograms=[histogram_anti_iso_tau_0jet], variables=Variable, weight=[tree.weight_sf])
+                    FillHistosPredicted(tree=tree, histograms=[histogram_iso_tau_predicted_0jet], variables=Variable, weight=[(tree.weight_sf * raw_FF_value)],fractions=frac)
+                elif ( eval(cuts["-NJET_1-"]) ) :
+                    FillHistos(tree=tree, histograms=[histogram_anti_iso_tau_1jet], variables=Variable, weight=[tree.weight_sf])
+                    FillHistosPredicted(tree=tree, histograms=[histogram_iso_tau_predicted_1jet], variables=Variable, weight=[(tree.weight_sf * raw_FF_value)],fractions=frac)
+                elif ( eval(cuts["-NJET_geq2-"]) ) :
+                    FillHistos(tree=tree, histograms=[histogram_anti_iso_tau_2jet], variables=Variable, weight=[tree.weight_sf])
+                    FillHistosPredicted(tree=tree, histograms=[histogram_iso_tau_predicted_2jet], variables=Variable, weight=[(tree.weight_sf * raw_FF_value)],fractions=frac)
                     
                 
                 if (tree.weight_sf * raw_FF_value < 0) :
@@ -167,19 +192,22 @@ def DR_creation(path, name, Variable, cuts) :
             #     break      
 
     for iv, v in enumerate(Variable) :
-        output = ROOT.TFile("{0}/{1}{2}.root".format(region,v["hist_name"],extension),"RECREATE") 
-
+        output = ROOT.TFile("{0}/{1}/{2}/{3}_pred_FFmc.root".format(region,year,channel,v["hist_name"]),"RECREATE") 
+        
         histogram_iso_tau[iv].Write()
         histogram_iso_tau_0jet[iv].Write()
         histogram_iso_tau_1jet[iv].Write()
+        histogram_iso_tau_2jet[iv].Write()
         
         histogram_anti_iso_tau[iv].Write()
         histogram_anti_iso_tau_0jet[iv].Write()
         histogram_anti_iso_tau_1jet[iv].Write()
+        histogram_anti_iso_tau_2jet[iv].Write()
     
         histogram_iso_tau_predicted[iv].Write()
         histogram_iso_tau_predicted_0jet[iv].Write()
         histogram_iso_tau_predicted_1jet[iv].Write()
+        histogram_iso_tau_predicted_2jet[iv].Write()
     
 
         output.Close()
@@ -360,7 +388,21 @@ s = time.time()
 #     Wjets_QCD_estimation(channel=pre_selection_files[0]["channel"], year=pre_selection_files[0]["year"], var=var) 
 
 ######## W+jets fractions in DR Wjets ######
-for var in Variable :
-    CreateFractions(channel=pre_selection_files[0]["channel"], year=pre_selection_files[0]["year"], var=var, region="DR_Wjets")
+# for var in Variable :
+#     CreateFractions(channel=pre_selection_files[0]["channel"], year=pre_selection_files[0]["year"], var=var, region="DR_Wjets")
+
+
+DR_creation(
+    path=pre_selection_files[0]["path"], 
+    pathRawFF="/home/jandrej/DeepTauFFproduction/2018_v15/CMSSW_8_0_25/src/ViennaTool/fakefactor/data_mt/FF_corr_Wjets_MC_noGen_fitted.root", 
+    name=pre_selection_files[0]["path"], 
+    Variable=Variable, 
+    cuts=cuts, 
+    region=Regions[0]["name"], 
+    DR_cuts=Regions[0]["selection"],
+    channel=pre_selection_files[0]["channel"], 
+    year=pre_selection_files[0]["year"],
+) 
+    
 
 print "execution time: {}".format(time.time()-s)
