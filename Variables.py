@@ -13,7 +13,7 @@ Variable = [
     },
     {
         "name": "tree.alltau_pt[tree.tau_iso_ind]",
-        "binning" : array('d',[0,20,30,40,50,60,70,80,90,100,125,150,175,200,300,500]),
+        "binning" : array('d',[0,20,30,40,50,60,70,80,90,100,125,150,175,200]),
         "N_bins" : 25,
         "bin_min" : 20,
         "bin_max" : 100,
@@ -75,6 +75,12 @@ Variable = [
         "name": "tree.lep_pt",
         "binning" : array('d',[0,20,30,40,50,60,70,80,90,100,125,150,175,200,300,500]),
         "hist_name" : "h_lep_pt",
+        "xlabel" : "p_{T}(lepton) [GeV]"
+    },
+    {
+        "name": "tree.ptvis",
+        "binning" : array('d',[0,20,30,40,50,60,70,80,90,100,125,150,175,200,300,500]),
+        "hist_name" : "h_ptvis",
         "xlabel" : "p_{T}(lepton) [GeV]"
     },
     # {
