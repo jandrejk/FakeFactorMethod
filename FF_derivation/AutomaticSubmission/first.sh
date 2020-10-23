@@ -1,0 +1,6 @@
+ERA=$1
+CHANNEL=$2
+PASS=$3
+FAIL=$4
+EXT=$5
+sh script.sh $ERA $CHANNEL $PASS $FAIL $EXT &> ${ERA}_${CHANNEL}_${PASS}_${FAIL}_${EXT}.log
