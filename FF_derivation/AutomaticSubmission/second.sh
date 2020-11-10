@@ -1,6 +1,6 @@
-WP_pass='32'
-WP_fail='4'
-EXT='v7'
+WP_pass='16'
+WP_fail='1'
+EXT='MSSM_vXY'
 
 for ERA in 2016 2017 2018
 do
