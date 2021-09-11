@@ -11,8 +11,8 @@ cd ${ERA}/${CHANNEL}
 cmsrel CMSSW_8_0_25
 cd CMSSW_8_0_25/src/; cmsenv
 
-git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_MSSM_${ERA}_v0 . #use of MSSM HTT analysis
-# git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_LQ_${ERA} . #use of LQ analysis
+# git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_MSSM_${ERA}_v0 . #use of MSSM HTT analysis
+git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_LQ_${ERA} . #use of LQ analysis
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_${ERA}_v15_v7 . #use of SM HTT
 git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes
 cd HTTutilities/Jet2TauFakes

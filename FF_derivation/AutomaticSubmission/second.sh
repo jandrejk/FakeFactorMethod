@@ -1,8 +1,8 @@
 WP_pass='16'
-WP_fail='1'
-EXT='MSSM_vXY'
+WP_fail='4'
+EXT='FF_LQ_v3p0'
 
-for ERA in 2016 2017 2018
+for ERA in 2016 2017 2018 
 do
     for CHANNEL in et mt tt
     do
