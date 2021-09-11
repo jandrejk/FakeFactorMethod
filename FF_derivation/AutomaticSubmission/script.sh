@@ -3,9 +3,11 @@ CHANNEL=$2
 PASS=$3
 FAIL=$4
 EXT=$5
+VER=$6
 source /cvmfs/grid.cern.ch/emi3ui-latest/etc/profile.d/setup-ui-example.sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
+export SCRAM_ARCH=slc6_amd64_gcc530
 mkdir ${ERA}/${CHANNEL} -p
 cd ${ERA}/${CHANNEL}
 cmsrel CMSSW_8_0_25
@@ -13,6 +15,7 @@ cd CMSSW_8_0_25/src/; cmsenv
 
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_MSSM_${ERA}_v0 . #use of MSSM HTT analysis
 git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_LQ_${ERA} . #use of LQ analysis
+git checkout LQ_${ERA}_${VER}
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_${ERA}_v15_v7 . #use of SM HTT
 git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes
 cd HTTutilities/Jet2TauFakes

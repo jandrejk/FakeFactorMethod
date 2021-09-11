@@ -1,12 +1,13 @@
 WP_pass='16'
 WP_fail='4'
-EXT='FF_LQ_v3p0'
+EXT='FF_LQ_v2p3'
+VER='v2p3'
 
-for ERA in 2016 2017 2018 
+for ERA in 2016 #2017 2018 
 do
-    for CHANNEL in et mt tt
+    for CHANNEL in et #mt tt
     do
-       sh first.sh $ERA $CHANNEL $WP_pass $WP_fail $EXT &
+       sh first.sh $ERA $CHANNEL $WP_pass $WP_fail $EXT $VER &
     done
 done
 wait

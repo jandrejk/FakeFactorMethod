@@ -3,4 +3,5 @@ CHANNEL=$2
 PASS=$3
 FAIL=$4
 EXT=$5
-sh script.sh $ERA $CHANNEL $PASS $FAIL $EXT &> ${ERA}_${CHANNEL}_${PASS}_${FAIL}_${EXT}.log
+VER=$6
+sh script.sh $ERA $CHANNEL $PASS $FAIL $EXT $VER &> ${ERA}_${CHANNEL}_${PASS}_${FAIL}_${EXT}.log
