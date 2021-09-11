@@ -1,3 +1,10 @@
+*.log
+*.png
+*.pdf
+*.eps
+*.root
+FF_derivation/AutomaticSubmission/201*/*
+
 # Prerequisites
 *.d
 
