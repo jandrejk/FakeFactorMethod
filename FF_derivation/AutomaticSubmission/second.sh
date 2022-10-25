@@ -4,14 +4,15 @@ EXT='FF_LQ_v2p2'
 VER='v2p2'
 USER='janik.andrejkovic'
 
-for ERA in 2016 #2017 2018 
+for ERA in 2016 2017 2018 
 do
-    for CHANNEL in et #mt tt
+    for CHANNEL in et mt tt
     do
-       sh first.sh $ERA $CHANNEL $WP_pass $WP_fail $EXT $VER $USER &
+    #    sh first.sh $ERA $CHANNEL $WP_pass $WP_fail $EXT $VER $USER &
+       submit "sh first.sh $ERA $CHANNEL $WP_pass $WP_fail $EXT $VER $USER" --walltime 02:00:00 --title "FF_$ERA\_$CHANNEL\_$WP_pass\_$WP_fail\_$EXT"
     done
 done
-wait
+# wait
 
 # _VVVLOOSE         1 
 # _VVLOOSE          2

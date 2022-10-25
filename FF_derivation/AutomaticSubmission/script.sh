@@ -15,7 +15,7 @@ cmsrel CMSSW_8_0_25
 cd CMSSW_8_0_25/src/; cmsenv
 
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_MSSM_${ERA}_v0 . #use of MSSM HTT analysis
-git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_CLIP_LQ_${ERA} . #use of LQ analysis
+git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_CLIP_LQ_${ERA} . #use of LQ analysis on CLIP (branched off at v2p2 of FF_DeepTau_LQ_${ERA})
 # git checkout LQ_${ERA}_${VER}
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_${ERA}_v15_v7 . #use of SM HTT
 git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes
