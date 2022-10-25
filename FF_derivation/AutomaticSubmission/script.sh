@@ -4,6 +4,7 @@ PASS=$3
 FAIL=$4
 EXT=$5
 VER=$6
+USER=$7
 source /cvmfs/grid.cern.ch/emi3ui-latest/etc/profile.d/setup-ui-example.sh
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
@@ -14,17 +15,17 @@ cmsrel CMSSW_8_0_25
 cd CMSSW_8_0_25/src/; cmsenv
 
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_MSSM_${ERA}_v0 . #use of MSSM HTT analysis
-git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_LQ_${ERA} . #use of LQ analysis
-git checkout LQ_${ERA}_${VER}
+git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_CLIP_LQ_${ERA} . #use of LQ analysis
+# git checkout LQ_${ERA}_${VER}
 # git clone https://github.com/jandrejk/FakeFactor.git -b FF_DeepTau_${ERA}_v15_v7 . #use of SM HTT
 git clone https://github.com/CMS-HTT/Jet2TauFakes.git HTTutilities/Jet2TauFakes
 cd HTTutilities/Jet2TauFakes
 git checkout v0.2.1
 cd ../../
 scram b -j 8
-mkdir /ceph/jandrej/auto-fakefactors/${PASS}_${FAIL}_${ERA}_${EXT}/${CHANNEL} -p
-mkdir /ceph/jandrej/auto-fakefactors/${PASS}_${FAIL}_${ERA}_${EXT}/${CHANNEL}/sim -p
-mkdir /ceph/jandrej/auto-fakefactors/${PASS}_${FAIL}_${ERA}_${EXT}/${CHANNEL}/Images_EMB -p
+mkdir /groups/hephy/cms/${USER}/fakefactors/auto-fakefactors/${PASS}_${FAIL}_${ERA}_${EXT}/${CHANNEL} -p
+mkdir /groups/hephy/cms/${USER}/fakefactors/auto-fakefactors/${PASS}_${FAIL}_${ERA}_${EXT}/${CHANNEL}/sim -p
+mkdir /groups/hephy/cms/${USER}/fakefactors/auto-fakefactors/${PASS}_${FAIL}_${ERA}_${EXT}/${CHANNEL}/Images_EMB -p
 
 if [ "$CHANNEL" == "et" ];  then f_chan="kEL"; fi
 if [ "$CHANNEL" == "mt" ];  then f_chan="kMU"; fi
@@ -39,8 +40,10 @@ sed -i 's#wpTightFulfill.*#wpTightFulfill = '${PASS}';#g' ViennaTool/Settings.h
 sed -i 's#wpLooseFulfill.*#wpLooseFulfill  = '${FAIL}';#g' ViennaTool/Settings.h
 sed -i 's#wpLooseFail.*#wpLooseFail    = '${PASS}';#g' ViennaTool/Settings.h
 
-sed -i 's#output_folder =.*#output_folder ="/ceph/jandrej/auto-fakefactors/'${PASS}'_'${FAIL}'_'${ERA}'_'${EXT}'/";#g' ViennaTool/Settings.h
+sed -i 's#output_folder =.*#output_folder ="/groups/hephy/cms/'${USER}'/fakefactors/auto-fakefactors/'${PASS}'_'${FAIL}'_'${ERA}'_'${EXT}'/";#g' ViennaTool/Settings.h
 sed -i 's#analysis.*#analysis ="'${PASS}'_'${FAIL}'_'${ERA}'_'${EXT}'";#g' ViennaTool/Settings.h
+sed -i 's#user=.*#user="'${USER}'";#g' ViennaTool/Settings.h
+# comment line below in if you want to run in debug-mode
 # sed -i 's#DEBUG=0#DEBUG    ='1'#g' ViennaTool/Settings.h
 
 make -B
